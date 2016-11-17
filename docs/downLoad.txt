@@ -1,14 +1,16 @@
+
+第一次时：网关下载服务器上的程序
 git clone https://github.com/547895019/artGateway.git
 
-
-=====================================
-
-
-
+//网关上传程序到服务器
 git add .
 git commit -m "some changes"
 git push -u origin master
 
+//网关从服务器上更新程序 并合并
+git pull
+
+//账号  密码
 name:suyliang 
 pwd :syl0909
 
