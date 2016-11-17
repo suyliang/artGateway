@@ -1,3 +1,0 @@
-进入文件所在目录
-压缩：tar -cf artGateway.tar artGateway
-解缩：sudo tar xvf artGateway.tar

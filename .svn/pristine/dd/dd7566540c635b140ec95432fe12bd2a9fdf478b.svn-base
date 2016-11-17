@@ -1,6 +1,0 @@
-修改权限问题：
-进入该文件的目录下，执行 chmod a+x modbus_read_rtu  （modbusrtu 是文件名）
-进入该文件的目录下，执行 chmod a+x modbus_write_rtu  （modbusrtu 是文件名）
-进入该文件的目录下，执行 chmod a+x bacwp      （modbusrtu 是文件名）
-进入该文件的目录下，执行 chmod a+x bacrp      （modbusrtu 是文件名）
-进入该文件的目录下，执行 chmod a+x zone       （modbusrtu 是文件名）
