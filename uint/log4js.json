@@ -1,0 +1,18 @@
+{
+  "customBaseDir" :"/var/lib/cloud9/logs/",
+  "customDefaultAtt" :{
+    "type": "dateFile",
+    "absolute": true,
+    "alwaysIncludePattern": true
+  },
+  "appenders": [
+    {"type": "console", "category": "console"},
+    {"pattern": "debug/yyyyMMddhh.txt", "category": "logDebug"},
+    {"pattern": "info/yyyyMMddhh.txt", "category": "logInfo"},
+    {"pattern": "warn/yyyyMMddhh.txt", "category": "logWarn"},
+    {"pattern": "err/yyyyMMddhh.txt", "category": "logErr"},
+    {"backups": 7}
+  ],
+  "replaceConsole": true,
+  "levels":{ "logDebug": "DEBUG", "logInfo": "DEBUG", "logWarn": "DEBUG", "logErr": "DEBUG"}
+}

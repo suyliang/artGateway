@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/bacnet/bacnet.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bacnetManager.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/common.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/config/enum_deviceids.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/configManager.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/connect/connectGateway.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/connect/connectNwkmgr.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/connect/connectService.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/connect/connectYun.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/docs/gateway-path" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/fireCheck/fireCheckAction.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/fireCheckManager.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gatewayIndex.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/led.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/memoryUse.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modbus/modbusAction.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modbus/modbusCommon.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/modbusManager.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/uint/debugLogFs.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/uint/myLog4js.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/uint/upLoadClient.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/uint/zgbDevicesFs.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/upLoadInfos/upLoad.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/upLoadInfos/upLoadjs.json" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zgb/gatewayAction.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zgb/nwkmgrAction.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zgb/zgbCommon.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zgbManager.js" charset="UTF-8" />
+  </component>
+</project>

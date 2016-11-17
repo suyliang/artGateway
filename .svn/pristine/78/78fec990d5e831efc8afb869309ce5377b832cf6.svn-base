@@ -1,0 +1,537 @@
+//  Filename:       gateway.proto
+//  Revised:        2016.3.11
+//  Revision:       v1.0
+//  
+//  Description:    Gateway Server Protocol Buffers Definition File
+//                
+//  
+
+//功能码
+enum gwFunctionId_t
+{
+  RPC_SYS_PB_GW_MGR = 10;
+}
+
+
+// 命令
+enum CmdId_t 
+{
+  GW_GENERIC_RSP = 0;
+  GW_GENERIC_IND_RSP = 1; //通用上传响应
+  GW_HANDSHAKE_IND = 2; //网关握手
+  GW_BEAT_IND = 3; //心跳包上传
+  GW_GET_GATEWAY_INFO_REQ = 4;
+  GW_GET_GATEWAY_INFO_RSP = 5;
+  GW_GATEWAY_INFO_IND = 6; //网关信息上传
+  GW_GET_DEVICE_LIST_REQ = 7;
+  GW_GET_DEVICE_LIST_RSP = 8;
+  GW_DEVICE_LIST_IND = 9; //网关设备列表上传
+  GW_READ_OBJECT_ATTRIBUTE_MULTIPLE_REQ = 10;
+  GW_READ_OBJECT_ATTRIBUTE_MULTIPLE_RSP = 11;
+  GW_OBJECT_ATTRIBUTE_MULTIPLE_IND = 12;  //对象属性上传
+  GW_WRITE_OBJECT_ATTRIBUTE_MULTIPLE_REQ = 13; //对象属性写请求
+  GW_WRITE_OBJECT_ATTRIBUTE_MULTIPLE_RSP = 14; //对象属性写响应
+  GW_UPDATA_DEVICE_STATUS_IND = 15; //更新网关中设备的状态
+  GW_ERR_OR_STATUS_IND = 16; //网关的一些问题，或者说状态
+
+  GW_SCAN_DEVICE_REQ = 17; //扫描添加设备
+  GW_SCAN_DEVICE_RSP = 18; //扫描设备响应
+  GW_DELETE_DEVICE_REQ = 19; //删除设备
+  GW_DELETE_DEVICE_RSP = 20; //删除设备响应
+
+  GW_UP_LOAD_CONFIG_REQ = 21; //客户端通知网关更新（下载）配置文件
+  GW_UP_LOAD_CONFIG_RSP = 22; //网关下载配置文件响应（完成或者出错）
+
+  GW_ALL_ONOFF_REQ = 23; //全开或全关命令
+  GW_ALL_ONOFF_RSP = 24; //全开或全关命令的响应
+  
+  GW_DIDO_USEDATE_LIST_IND = 25; 
+  GW_DIDO_USEDATE_DELETE_REQ = 26;
+  GW_DIDO_USEDATE_DELETE_RSP = 27;
+  
+}
+
+//网关信息
+message HandshakeInfo_t
+{
+  required fixed64 productID = 1;                 // (uint64) 联网认证ID
+  required fixed64 productKey = 2;                 // (uint64) 联网认证密钥
+}
+
+
+//网关信息
+message GatewayInfo_t
+{
+  required string address = 1; // (uint16) 网关地址
+  required string versions =2; // (uint16) 网关版本
+  required string  describe= 3; // (string) 网关描述,字符串
+}
+
+//设备列表
+message DeviceList_t
+{
+  required uint32 driverId = 1; //协议类型（驱动）
+  required uint32 deviceId = 2;               // (uint16) 配置文件中某个驱动下的的设备id
+  required string  describe= 3; // (string) 设备描述,字符串
+  required DeviceStatus_t deviceStatus = 4;  // (uint8)  设备状态
+  repeated ObjectList_t objectList = 5; //array of ObjectList_t  对象列表
+  optional string deviceMacAddress = 6;		  // 设备的mac地址	
+}
+
+//对象列表
+message ObjectList_t
+{
+  required uint32 objectId = 1; // (uint16) 对象id
+  optional uint32 objectType = 2; // (uint16)
+  optional uint32 objectIndex = 3; // (uint16)
+  required string describe = 4; // (string) 对象描述,字符串
+  required ObjectStatus_t objectStatus = 5; // (uint8)  对象状态
+  repeated AttributeList_t attributeList = 6 ;//array of AttributeList_t 属性列表
+}
+
+//属性列表
+message AttributeList_t
+{
+  required uint32 attributeType = 1; // (uint8) 属性类型
+  optional AttributeDataTypes_t attributeDataType = 2;  //(uint8)  属性数据类型
+  optional string attributeValue = 3;                // string 属性当前值
+  optional string attributeValueMin = 4;  //(string)  属性最小值
+  optional string attributeValueMax = 5;  // (string)  属性最大值
+
+}
+
+//读写设备列表
+message DeviceObjectAttributeList_t
+{
+  required uint32 driverId = 1;
+  required uint32 deviceId = 2; // (uint16) 配置文件中某个驱动下的的设备id
+  optional DeviceStatus_t deviceStatus = 3; // DeviceStatus_t  设备状态
+  repeated ObjectAttributeList_t objectList = 4; //array of ObjectList_t  对象列表
+}
+
+//读写对象列表
+message ObjectAttributeList_t
+{
+  required uint32 objectId = 1; // (uint16)
+  optional uint32 objectType = 2; // (uint16)
+  optional uint32 objectIndex = 3; // (uint16)
+  repeated AttributeList_t attributeList = 4 ;//array of AttributeList_t 属性列表
+}
+
+//上传设备状态列表
+message DeviceStatusList_t
+{
+  required uint32 driverId = 1;
+  required uint32 deviceId = 2; // (uint16) 配置文件中某个驱动下的的设备id
+  required DeviceStatus_t deviceStatus = 3; // DeviceStatus_t  设备状态
+  optional fixed64 timestamp = 4;
+}
+message ScanDeviceInfo_t
+{
+  required string ieeeAddress = 1;       // device extended address string (type)
+  required fixed64 ieeeAddress_long = 2;       // device extended address long (type)
+  required uint32 deviceId = 3;           // (uint16) device ID
+  required uint32 deviceVer = 4;          // (uint16) device version
+  required uint32 manufacturerId = 5;     // (uint16) manufacturer ID
+  optional DeviceStatus_t deviceStatus = 6;     // (uint16) device status
+  optional string deviceDes = 7;     // (uint16) device describe
+  optional uint32 isUse = 8;     // (uint16) 0 表示 未使用，1表示已使用
+}
+//DIDO数据列表
+message DidoUseDataInfo_t
+{
+  required string ieeeAddress = 1;       // device extended address string (type)
+  required uint32 deviceId = 3;           // (uint16) device ID
+  required uint32 objectId = 4;          // (uint16) device version
+  required uint32 attributeType = 5;     // (uint16) attributeType 0 表示当前值
+  required uint32 endpointId = 6;     // (uint16) dido的端点
+  optional string deviceDes = 7;     // (uint16) device describe
+  optional string objectDes = 8;     // (uint16) object describe
+  optional uint32 cur_hour = 9;      // (uint16) 当前是时间段（小时）
+  optional uint32 dayUse = 10;        // (uint16) 直到当前时间段 的时候 今天使用的总时间
+}
+
+
+//上传扫描添加的设备属性
+/*
+        IeeeAddr,             EndpointId,ProfileId,DeviceId,DeviceVer,NumIncluster,NumOutClusters,Clusters
+#       00:12:4B:00:08:C3:92:E5 , 8 ,      0x0104,  0x0305 ,   0 ,        3 ,           1 ,       0x0000 , 0x0003 , 0x0403 , 0x0003
+        00:12:4B:00:08:C3:92:A6 , 8 ,      0x0104,  0x0008 ,   0 ,        2 ,           1 ,       0x0000 , 0x0003 , 0x0003
+*/
+message nwkDeviceInfo_t
+{
+  required uint32 networkAddress = 1;                 // (uint16) device short address
+  required fixed64 ieeeAddress = 2;                   // device extended address
+  optional fixed64 parentIeeeAddress = 3;             // IEEE address of the parent device, if available
+  required uint32 profileId = 4;          // (uint16) applications profile ID
+  required uint32 deviceId = 5;           // (uint16) device ID
+  required uint32 deviceVer = 6;          // (uint16) device version
+  required uint32 manufacturerId = 7;                 // (uint16) manufacturer ID
+  repeated nwkSimpleDescriptor_t endpointList = 8;
+  required DeviceStatus_t deviceStatus = 9;
+}
+
+message nwkSimpleDescriptor_t
+{
+  required uint32 endpointId = 1;         // (uint8) endpoint
+  repeated uint32 inputClusters = 5;      // Array of (uint16) input clusters
+  repeated uint32 outputClusters = 6;     // Array of (uint16) output clusters
+}
+
+//设备状态
+enum DeviceStatus_t
+{
+  DEVICE_OFF_LINE = 0;             // 设备离线
+  DEVICE_ON_LINE = 1;              // 设备在线
+  DEVICE_REMOVED = 2;              // 设备移除
+  DEVICE_CREATE= 3;               // 设备创建
+  DEVICE_CHANGE= 4;               // 设备修改
+  DEVICE_NA = 255;                 // 设备不可用
+}
+//对象状态
+enum ObjectStatus_t
+{
+  OBJECT_CREATE = 0;             // 对象创建
+  OBJECT_REMOVED = 1;              // 对象移除
+  OBJECT_CHANGE= 2;               // 对象修改
+  OBJECT_NA = 255;                 // 对象不可用
+}
+
+//对象类型
+enum ObjectType_t
+{
+  OBJECT_DEVICE = 0;             // 设备
+  OBJECT_AI = 1;              // 模拟输入
+  OBJECT_AO = 2;              // 模拟输出
+  OBJECT_AV = 3;                 // 模拟数值
+  OBJECT_BI = 4;                 // 数字输入
+  OBJECT_BO = 5;                 // 数字输出
+  OBJECT_BV = 6;                 // 数字数值
+  OBJECT_FILE = 7;                 // 文件
+  OBJECT_UNKNOWN=255; //无效
+}
+
+
+enum AttributeType_t
+{
+  ATTRIBUTE_PRESENT_VALUE = 0;             // 当前值
+  ATTRIBUTE_MAX_VALUE =1;  // 最大值
+  ATTRIBUTE_MIN_VALUE =2; // 最小值
+  ATTRIBUTE_UNITS =3;  //单位
+  ATTRIBUTE_FILE_NAME =4; //文件名
+  ATTRIBUTE_UNKNOWN=255; //无效
+} 
+
+//属性值类型
+enum AttributeDataTypes_t
+{
+  DATATYPE_NO_DATA = 0x00;
+  DATATYPE_DATA8 = 0x08;
+  DATATYPE_DATA16 = 0x09;
+  DATATYPE_DATA24 = 0x0a;
+  DATATYPE_DATA32 = 0x0b;
+  DATATYPE_DATA40 = 0x0c;
+  DATATYPE_DATA48 = 0x0d;
+  DATATYPE_DATA56 = 0x0e;
+  DATATYPE_DATA64 = 0x0f;
+  DATATYPE_BOOLEAN = 0x10;
+  DATATYPE_BITMAP8 = 0x18;
+  DATATYPE_BITMAP16 = 0x19;
+  DATATYPE_BITMAP24 = 0x1a;
+  DATATYPE_BITMAP32 = 0x1b;
+  DATATYPE_BITMAP40 = 0x1c;
+  DATATYPE_BITMAP48 = 0x1d;
+  DATATYPE_BITMAP56 = 0x1e;
+  DATATYPE_BITMAP64 = 0x1f;
+  DATATYPE_UINT8 = 0x20;
+  DATATYPE_UINT16 = 0x21;
+  DATATYPE_UINT24 = 0x22;
+  DATATYPE_UINT32 = 0x23;
+  DATATYPE_UINT40 = 0x24;
+  DATATYPE_UINT48 = 0x25;
+  DATATYPE_UINT56 = 0x26;
+  DATATYPE_UINT64 = 0x27;
+  DATATYPE_INT8 = 0x28;
+  DATATYPE_INT16 = 0x29;
+  DATATYPE_INT24 = 0x2a;
+  DATATYPE_INT32 = 0x2b;
+  DATATYPE_INT40 = 0x2c;
+  DATATYPE_INT48 = 0x2d;
+  DATATYPE_INT56 = 0x2e;
+  DATATYPE_INT64 = 0x2f;
+  DATATYPE_ENUM8 = 0x30;
+  DATATYPE_ENUM16 = 0x31;
+  DATATYPE_SEMI_PREC = 0x38;
+  DATATYPE_SINGLE_PREC = 0x39;
+  DATATYPE_DOUBLE_PREC = 0x3a;
+  DATATYPE_OCTET_STR = 0x41;
+  DATATYPE_CHAR_STR = 0x42;
+  DATATYPE_LONG_OCTET_STR = 0x43;
+  DATATYPE_LONG_CHAR_STR = 0x44;
+  DATATYPE_ARRAY = 0x48;
+  DATATYPE_STRUCT = 0x4c;
+  DATATYPE_SET = 0x50;
+  DATATYPE_BAG = 0x51;
+  DATATYPE_TOD = 0xe0;
+  DATATYPE_DATE = 0xe1;
+  DATATYPE_UTC = 0xe2;
+  DATATYPE_CLUSTER_ID = 0xe8;
+  DATATYPE_ATTR_ID = 0xe9;
+  DATATYPE_BAC_OID = 0xea;
+  DATATYPE_IEEE_ADDR = 0xf0;
+  DATATYPE_128_BIT_SEC_KEY = 0xf1;
+  DATATYPE_UNKNOWN = 0xff;
+}
+
+//状态
+enum gwStatus_t
+{
+  STATUS_SUCCESS = 0;
+  STATUS_FAILURE = 1;
+  STATUS_BUSY = 2;      // state machine busy, resources unavailable... 
+  STATUS_INVALID_PARAMETER = 3;
+  STATUS_TIMEOUT = 4;
+}
+
+enum gwErrOrStatus_t
+{
+  ERR_STATUS1 = 0;
+  ERR_STATUS2 = 1;
+  ERR_STATUS3 = 2;
+  ERR_STATUS4 = 3;
+  ERR_STATUS5 = 4;
+  ERR_STATUS6 = 5;
+  ERR_STATUS7 = 6;
+  ERR_STATUS8 = 7;
+  ERR_STATUS9 = 8;
+  ERR_STATUS10 = 9;
+}
+
+//-----------------------------------------
+// Generic Foundation Layer API set
+//-----------------------------------------
+
+//GW_GENERIC_RSP
+message GwGenericRsp
+{
+  required CmdId_t cmdId = 1 [default = GW_GENERIC_RSP];  // don't change this field
+  required string address = 2; // (uint16) 网关地址
+  required gwStatus_t status = 3;
+  optional uint32 sequenceNumber = 4;    // (uint16) transaction sequence number
+}
+
+//GW_GENERIC_IND_RSP
+message GwGenericIndRsp
+{
+  required CmdId_t cmdId = 1 [default = GW_GENERIC_IND_RSP];  // don't change this field
+  required CmdId_t rspCmdId = 2;
+  required string address = 3; //网关地址
+  required gwStatus_t status = 4;
+  optional uint32 sequenceNumber = 5;    // (uint16) transaction sequence number
+}
+
+//GW_HANDSHAKE_IND
+message GwHandshakeInd
+{
+  required CmdId_t cmdId = 1 [default = GW_HANDSHAKE_IND];  // don't change this field
+  required string address = 2; //网关地址
+  required HandshakeInfo_t  handshakeInfo =  3;
+}
+
+//GW_BEAT_IND
+message GwBeatInd
+{
+  required CmdId_t cmdId = 1 [default = GW_BEAT_IND];  // don't change this field
+  required string address = 2; //网关地址
+}
+
+//GW_GET_GATEWAY_INFO_REQ
+message GwGetGatewayInfoReq
+{
+  required CmdId_t cmdId = 1 [default = GW_GET_GATEWAY_INFO_REQ];  // don't change this field
+  required string address = 2; //网关地址
+  optional string ipAddress = 3; //网关ip地址
+}
+
+//GW_GET_GATEWAY_INFO_RSP
+message GwGetGatewayInfoRsp
+{
+  required CmdId_t cmdId = 1 [default = GW_GET_GATEWAY_INFO_RSP];  // don't change this field
+  required string address = 2; //网关地址
+  required gwStatus_t status = 3;
+  repeated GatewayInfo_t gatewayInfo = 4;
+}
+
+//GW_GATEWAY_INFO_IND
+message GwGatewayInfoInd
+{
+  required CmdId_t cmdId = 1 [default = GW_GATEWAY_INFO_IND];  // don't change this field
+  required string address = 2; //网关地址
+  required GatewayInfo_t gatewayInfo = 3;
+}
+
+
+//GW_GET_DEVICE_LIST_REQ
+message GwGetDeviceListReq
+{
+  required CmdId_t cmdId = 1 [default = GW_GET_DEVICE_LIST_REQ];  // don't change this field
+  required string address = 2; //网关地址
+}
+
+//GW_GET_DEVICE_LIST_RSP
+message GwGetDeviceListRsp
+{
+  required CmdId_t cmdId = 1 [default = GW_GET_DEVICE_LIST_RSP];  // don't change this field
+  required string address = 2; //网关地址
+  required gwStatus_t status = 3;
+  repeated DeviceList_t deviceList = 4;
+}
+
+//GW_DEVICE_LIST_IND
+message GwDeviceListInd
+{
+  required CmdId_t cmdId = 1 [default = GW_DEVICE_LIST_IND];  // don't change this field
+  required string address = 2; //网关地址
+  repeated DeviceList_t deviceList = 3;
+  optional fixed64 timestamp = 4;
+}
+
+
+//GW_READ_OBJECT_ATTRIBUTE_MULTIPLE_REQ
+message GwReadObjectAttributeMultipleReq
+{
+  required CmdId_t cmdId = 1 [default = GW_READ_OBJECT_ATTRIBUTE_MULTIPLE_REQ];  // don't change this field
+  required string address = 2; //网关地址
+  repeated DeviceObjectAttributeList_t deviceObjectAttributeList = 3;  // (uint16)Array of attributeList
+}
+
+//GW_READ_OBJECT_ATTRIBUTE_MULTIPLE_RSP
+message GwReadObjectAttributeMultipleRsp
+{
+  required CmdId_t cmdId = 1 [default = GW_READ_OBJECT_ATTRIBUTE_MULTIPLE_RSP];  // don't change this field
+  required string address = 2; //网关地址
+  required gwStatus_t status = 3;
+  repeated DeviceObjectAttributeList_t deviceObjectAttributeList = 4; // array of (uint16) holding attribute IDs, using attrListNum
+}
+
+//GW_OBJECT_ATTRIBUTE_MULTIPLE_IND
+message GwObjectAttributeMultipleInd
+{
+  required CmdId_t cmdId = 1 [default = GW_OBJECT_ATTRIBUTE_MULTIPLE_IND];  // don't change this field
+  required string address = 2; //网关地址
+  repeated DeviceObjectAttributeList_t deviceObjectAttributeList = 3; // array of (uint16) holding attribute IDs, using attrListNum
+  optional fixed64 timestamp = 4;
+}
+
+//GW_WRITE_OBJECT_ATTRIBUTE_MULTIPLE_REQ
+message GwWriteObjectAttributeMultipleReq
+{
+  required CmdId_t cmdId = 1 [default = GW_WRITE_OBJECT_ATTRIBUTE_MULTIPLE_REQ];  // don't change this field
+  required string address = 2; //网关地址
+  repeated DeviceObjectAttributeList_t deviceObjectAttributeList = 3;
+  optional fixed64 timestamp = 4;
+}
+
+message GwWriteObjectAttributeMultipleRsp
+{
+  required CmdId_t cmdId = 1 [default = GW_WRITE_OBJECT_ATTRIBUTE_MULTIPLE_RSP];  // don't change this field
+  required string address = 2; //网关地址
+  required gwStatus_t status = 3;
+  optional fixed64 timestamp = 4;
+}
+
+message GwUpdataDeviceStatusInd
+{
+  required CmdId_t cmdId = 1 [default = GW_UPDATA_DEVICE_STATUS_IND];  // don't change this field
+  required string address = 2; //网关地址
+  repeated DeviceStatusList_t deviceStatusList = 3;
+}
+message GwErrOrStatusInd
+{
+  required CmdId_t cmdId = 1 [default = GW_ERR_OR_STATUS_IND];  // don't change this field
+  required string address = 2; //网关地址
+  required gwErrOrStatus_t status = 3;
+  optional fixed64 timestamp = 4;
+}
+
+message GwScanDeviceReq
+{
+  required CmdId_t cmdId = 1 [default = GW_SCAN_DEVICE_REQ ];  // don't change this field
+  required string address = 2; //网关地址
+  required uint32 scanType = 3; //扫描类型 0 表示不扫，1表示执行扫描，两者都会收到GwScanDeviceRsp
+}
+message GwScanDeviceRsp
+{
+  required CmdId_t cmdId = 1 [default = GW_SCAN_DEVICE_RSP ];  // don't change this field
+  required string address = 2; //网关地址
+  required uint32 driverId = 3; //驱动id
+  repeated ScanDeviceInfo_t newDeviceList = 4;//增加的设备列表
+}
+message GwDeleteDeviceReq
+{
+  required CmdId_t cmdId = 1 [default = GW_DELETE_DEVICE_REQ ];  // don't change this field
+  required string address = 2; //网关地址
+  required uint32 driverId = 3; //驱动id
+  optional uint32 deviceId = 4; //设备id
+  optional string deviceAddress = 5; //设备物理地址
+}
+message GwDeleteDeviceRsp
+{
+  required CmdId_t cmdId = 1 [default = GW_DELETE_DEVICE_RSP ];  // don't change this field
+  required string address = 2; //网关地址
+  required uint32 driverId = 3; //驱动id
+  required DeviceStatus_t status = 4; //操作结果
+  optional uint32 deviceId = 5; //设备id 可能为空，因为没在配置文件里使用
+
+}
+
+message GwUpLoadConfigReq
+{
+  required CmdId_t cmdId = 1 [default = GW_UP_LOAD_CONFIG_REQ ];  // don't change this field
+  required string address = 2; //网关地址
+  required string configUrl = 3; //文件名
+  required string configName = 4; //文件名
+  optional uint32 upLoadId = 5; //序号id
+}
+message GwUpLoadConfigRsp
+{
+  required CmdId_t cmdId = 1 [default = GW_UP_LOAD_CONFIG_RSP ];  // don't change this field
+  required string address = 2; //网关地址
+  required gwStatus_t result = 3; //下载结果
+  optional uint32 upLoadId = 4; //序号id
+}
+
+message GwAllOnOffReq
+{
+  required CmdId_t cmdId = 1 [default = GW_ALL_ONOFF_REQ ];  // don't change this field
+  required string address = 2; //网关地址
+  required uint32 controlType = 3; //控制类型，1为开，0为关
+  optional uint32 objectType = 4; //对象类型
+  optional uint32 objectIndex = 5; //对象索引
+}
+message GwAllOnOffRsp
+{
+  required CmdId_t cmdId = 1 [default = GW_ALL_ONOFF_RSP ];  // don't change this field
+  required string address = 2; //网关地址
+  required gwStatus_t result = 3; //控制结果
+}
+
+//GW_DIDO_USEDATE_LIST_IND = 25; 
+//GW_DIDO_USEDATE_DELETE_REQ = 26;
+//GW_DIDO_USEDATE_DELETE_RSP = 27;
+
+message GwDidoUseDataListInd
+{
+  required CmdId_t cmdId = 1 [default = GW_DIDO_USEDATE_LIST_IND ];  // don't change this field
+  required string address = 2; //网关地址
+  required uint32 driverId = 3; //驱动id
+  repeated DidoUseDataInfo_t didoUseDataList = 4;//上传的dido数据列表
+}
+
+message GwDidoUseDataDeleteReq
+{
+  required CmdId_t cmdId = 1 [default = GW_DIDO_USEDATE_DELETE_REQ ];  // don't change this field
+  required string address = 2; //网关地址
+  required string driverAddress = 3; //设备物理地址
+  required uint32 endpointId = 4; //dido端点
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<common>
+    <!-- 配置文件下载地址 -->
+    <!--configBaseUrl>http://192.168.0.103:8080/fdyweb/</configBaseUrl-->
+    <configBaseUrl>http://120.76.75.49:8080/fdyweb/</configBaseUrl>
+    <!-- zgbTimeOutMax zgb允许连续超时次数的最大数，大于这个书则标记为故障 -->
+    <zgbTimeOutMax>5</zgbTimeOutMax>
+    <!-- modbusTimeOutMax modbus允许连续超时次数的最大数，大于这个书则标记为故障 -->
+    <modbusTimeOutMax>10</modbusTimeOutMax>
+    <!-- bacnetTimeOutMax bacnet允许连续超时次数的最大数，大于这个书则标记为故障 -->
+    <bacnetTimeOutMax>10</bacnetTimeOutMax>
+    <!-- zgb 要读属性的设备id（类型），多个的话用逗号隔开 -->
+    <zgbReads>258</zgbReads>
+    <!-- zgb 要轮循去读属性的设备id（类型），多个的话用逗号隔开 -->
+    <zgbReadContinuals></zgbReadContinuals>
+    <!-- zgb 要读处理报告属性的设备id（类型），同时也会去读取该类型设备的属性，要处理多个的话用逗号隔开 -->
+    <zgbReports></zgbReports>
+    <!-- zgb 仅需要处理报告属性的设备id（类型），不会在去读该设备类型的属性，多个的话用逗号隔开 -->
+    <zgbOnlyReports>6,12,81,83,770,773</zgbOnlyReports>
+</common>
