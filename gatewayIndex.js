@@ -172,6 +172,7 @@ xmlParse.on('complete', function (data) {
                 initFireCheck(configDataObj.fireAttrisLenght);
             }
             _led.led_write(0,1);
+            //update();
         },3000);
     }
 });
@@ -489,11 +490,12 @@ function update() {
         }
         else
         {
-            if(stdout != "Already up-to-date")
+             _led.led_write(2, 1);
+            iotDevice.gwCheckGatewayUpdataRsp(0, true);
+                
+            if(stdout.indexOf("Already up-to-date.") == -1)
             {
-                _led.led_write(2, 1);
-                //reset_flag = 1;
-                iotDevice.gwCheckGatewayUpdataRsp(0, true);
+                //console.log(stdout);
                 setTimeout(function () 
                 {
                     reset();
