@@ -447,7 +447,7 @@ iotDevice.on(common.iotCmdId_t().IOT_REQ_UPDATA_GATEWAY_EVENT,function(data)
 {
     if(data.reqType == 0){
         //更新
-        //update();
+        update();
         //reset();
     }
     if(data.reqType == 1){
@@ -461,9 +461,8 @@ iotDevice.on(common.iotCmdId_t().IOT_REQ_UPDATA_GATEWAY_EVENT,function(data)
 
 /*function update() { 
     
- var child = exec('git pull', 
-     function (error, stdout, stderr) 
-     { 
+    exec('git pull',function (error, stdout, stderr) 
+    { 
          console.info('stdout: ' + stdout); 
          console.info('stderr: ' + stderr); 
          if (error !== null) 
@@ -474,31 +473,35 @@ iotDevice.on(common.iotCmdId_t().IOT_REQ_UPDATA_GATEWAY_EVENT,function(data)
          { 
              console.info('exec stdout: ' + stdout); 
          } 
-     }); 
+    }); 
  }*/
 
 
 function update() {
-    /*exec('git pull',function (error, stdout, stderr) {
-            console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-            if (error !== null) {
-                console.log('exec error: ' + error);
-                iotDevice.gwCheckGatewayUpdataRsp(0,false)
-            }
-            else
+    exec('git pull',function (error, stdout, stderr) 
+    {
+        console.log('stdout: ' + stdout);
+        console.log('stderr: ' + stderr);
+        if (error !== null) 
+        {
+            console.log('exec error: ' + error);
+            iotDevice.gwCheckGatewayUpdataRsp(0,false)
+        }
+        else
+        {
+            if(stdout != "Already up-to-date")
             {
-                if(stdout != "Already up-to-date")
+                _led.led_write(2, 1);
+                //reset_flag = 1;
+                iotDevice.gwCheckGatewayUpdataRsp(0, true);
+                setTimeout(function () 
                 {
-                    _led.led_write(2, 1);
-                    //reset_flag = 1;
-                    iotDevice.gwCheckGatewayUpdataRsp(0, true);
-                    setTimeout(function () {
-                        reset();
-                    }, 1000);
-                }
+                    reset();
+                    
+                }, 1000);
             }
-        });*/
+        }
+    });
 }
 
 function reset() {
