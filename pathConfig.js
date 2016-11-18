@@ -3,7 +3,7 @@
  */
 
 //config.xml配置文件在网关上的绝对路径
-var path_config = '/var/lib/cloud9/artGateway/config/config.xml';
+var path_config = '/var/lib/cloud9/gatewayConfig/config.xml';
 //funConfig.xml配置文件在网关上的绝对路径
 var path_funConfig = '/var/lib/cloud9/gatewayConfig/funConfig.xml';
 //173_device.xml.配置文件在网关上的绝对路径
@@ -13,7 +13,7 @@ var path_173_device = '/var/lib/cloud9/artGateway/config/173_device.xml';
 var path_funConfig_folder = '/var/lib/cloud9/gatewayConfig/';
 
 //config.xml 配置文件在本地调试时的相对路径
-var debug_configXml = './config/config.xml';
+var debug_configXml = '../gatewayConfig/config.xml';
 //funConfig.xml 配置文件在本地调试时的相对路径
 var debug_funConfigXml = '../gatewayConfig/funConfig.xml';
 //173_device.xml 配置文件在本地调试时的相对路径

@@ -22,7 +22,7 @@ var DownLoadFs = require('./uint/downLoadFs');
 //var upLoadClient = new UpLoadClient();
 //var deviceFs = require('./uint/zgbDevicesFs');
 //var yun_port = 11000;
-//var yun_host = "127.0.0.1";
+//var hnzz_host = "127.0.0.1";
 
 var childProcess = require('child_process');
 
@@ -30,7 +30,8 @@ var exec = require('child_process').exec;
 
 var yun_port = 13033;
 //var yun_host = "192.168.0.77";
-var yun_host = "120.76.75.49";
+var hnzz_host = "120.76.75.49";
+var user_host = "183.232.178.84";
 
 //var gate_host = "192.168.0.110";
 var gate_host = "127.0.0.1";
@@ -55,7 +56,7 @@ var yun_hbd = new HeadBodyBuffers(4, packetLength);
 var IotDevice = require("./IotDevice.js");
 var iotDevice = new IotDevice();
 
-//var yun_client = new connectYun(yun_port,yun_host,yun_hbd,iotDevice);
+//var yun_client = new connectYun(yun_port,hnzz_host,yun_hbd,iotDevice);
 var yun_client = null;
 var gate_client = null;
 var nwkmgr_client = null;
@@ -158,6 +159,9 @@ xmlParse.on('complete', function (data) {
 
     if(configDataObj != null)
     {
+        hnzz_host = global.hnzzIp;
+        user_host = global.userIp;
+        
         initYunClent();
 
         clearTimeout(startModuleTime);
@@ -245,7 +249,7 @@ function initYunClent()
 {
     if(yun_client == null)
     {
-        yun_client = new connectYun(yun_port,yun_host,yun_hbd,iotDevice);
+        yun_client = new connectYun(yun_port,hnzz_host,yun_hbd,iotDevice);
     }
 }
 

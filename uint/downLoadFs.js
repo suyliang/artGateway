@@ -28,7 +28,7 @@ DownLoadFs.prototype.download = function(last_url,fileName,uid)
     var req = http.get(url, function(res){
         var imgData = "";
         var isErr = false;
-        res.setEncoding("binary"); //һ��Ҫ����response�ı���Ϊbinary�����������������ļ��򲻿�
+        res.setEncoding("binary");
 
         res.on("data", function(chunk){
             if(chunk.indexOf("<html>") != -1){

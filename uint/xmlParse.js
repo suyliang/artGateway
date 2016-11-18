@@ -96,6 +96,8 @@ XmlParse.prototype.getGatewayConfig = function(jsonData){
         continuals = zgbReadContinuals.split(",");
     }
     global.configBaseUrl = jsonData.common.configBaseUrl
+    global.hnzzIp = jsonData.common.hnzzIp
+    global.userIp = jsonData.common.userIp
     global.zgbReports = reports;
     global.zgbOnlyReports = onlyReports;
     global.zgbReads = reas;
