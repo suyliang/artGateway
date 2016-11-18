@@ -161,7 +161,7 @@ xmlParse.on('complete', function (data) {
     {
         hnzz_host = global.hnzzIp;
         user_host = global.userIp;
-        
+        console.info("hnzz_host:" + hnzz_host + "-------" + "user_host:" + user_host);
         initYunClent();
 
         clearTimeout(startModuleTime);
