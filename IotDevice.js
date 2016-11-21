@@ -289,7 +289,7 @@ IotDevice.prototype.IotGwReqParser= function (cmdid,data){
             break;
         case gateway.CmdId_t.GW_GENERIC_IND_RSP: //云的通用响应
             var package = new gateway.GwGenericIndRsp.decode(data);
-            console.error("收到通用响应：类型为：", package.rspCmdId);
+            console.error("收到通用响应，目标为：", package.rspCmdId);
             this.emit("from_yun_common_rsp", package.rspCmdId, data);
             break;
         case gateway.CmdId_t.GW_SCAN_DEVICE_REQ: //扫描请求
