@@ -9,10 +9,3 @@ git push -u origin master
 
 //网关从服务器上更新程序 并合并
 git pull
-
-//账号  密码
-name:suyliang 
-pwd :syl0909
-
-
-547895019 a2522605 SS
