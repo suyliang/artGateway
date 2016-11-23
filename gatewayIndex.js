@@ -129,9 +129,6 @@ var startModuleTime = null;
  * 5.开始上传设备列表和采集数据,
  * */
 
-//update();
-
-
 xmlParse.on('complete', function (data) {
     //配置加载完毕，缓存处理完毕
     _led.led_write(1,1);
@@ -176,8 +173,8 @@ xmlParse.on('complete', function (data) {
                 initFireCheck(configDataObj.fireAttrisLenght);
             }
             _led.led_write(0,1);
-            //update();
-        },3000);
+
+        },5000);
     }
 });
 xmlParse.on('err', function (data) {
@@ -190,60 +187,40 @@ xmlParse.getxmldata(xmls);
 
 
 upDateSystemTime();
-
+var setTimeout_updataTime = 0;
 function upDateSystemTime()
 {
+    clearTimeout(setTimeout_updataTime);
+    var nextTime = 5000;
     childProcess.exec('ntpdate-debian',function(err,stdout,stderr)
     {
-        if(err)
-        {
+        if(err){
             //logger.writeErr("同步网络时间失败");
-
-            setTimeout(function()
-            {
-                upDateSystemTime();
-            },5000)
-        }
-        else
-        {
-            setTimeout(function()
-            {
-                upDateSystemTime();
-            },60000)
-
-            if(gatewayTimeIsUpDataed == false)
-            {
+            nextTime = 5000;
+        }else{
+            nextTime = 60000;
+            if(gatewayTimeIsUpDataed == false){
                 gatewayTimeIsUpDataed = true;
                 startZGB_DidoUseTime();
             }
             //logger.writeErr("同步网络时间成功");
             //process.exit();
         }
+        setTimeout_updataTime = setTimeout(function(){
+            upDateSystemTime();
+        },nextTime)
     });
 }
 
 //启动zgb dido设备的使用时间统计
 function startZGB_DidoUseTime()
 {
-    if(gatewayTimeIsUpDataed == false && zgbManager!= null){
-        setTimeout(function()
-        {
-            //启动dido统计系统
-            //zgbManager.beginDidoUse();
-        },1000)
+    if(gatewayTimeIsUpDataed == false && zgbManager!= null)
+    {
+        //启动dido统计系统
+        //zgbManager.beginDidoUse();
     }
-
 }
-
-//更新完配置后，再次执行更新xml
-function updateConfig()
-{
-    reset();
-    //var xmls = [[xml,0],[xml1,1],[xml2,2]];
-    //xmlParse.getxmldata(xmls);
-}
-
-var testWriteInterval = null;
 
 function initYunClent()
 {
@@ -330,20 +307,6 @@ function initFireCheck(len)
     //console.dir(fireAttrisArray);
     fireCheckManager.setFireDictionary(fireAttrisArray);
 }
-
-//初始化Fire准备工作
-/*function initCarParking(len)
- {
- if(carParkManager == null)
- {
- if(len == 0)return;
- var CarParkManager = require("./CarParkingManager")
- carParkManager = new CarParkManager(iotDevice);
- }
- //console.dir(fireAttrisArray);
- carParkManager.setFireDictionary(carAttrisArray);
- }*/
-
 //---------------------------------------------------------------------------------------------------------------
 //网关2540端口发回来的数据
 nwkmgr_hbd.on('packet', function (packet)
@@ -401,17 +364,7 @@ iotDevice.on("ind",function(cmdId,data)
         yun_client.write(buff);
         _led.led_toggle(1);
     }else{
-        //没连上,发不上去，有些信息 可以先保存，连上之后再发上去,主要的设备列表；
-        /*if(cmdId == 12)
-         {
-         var buffs = [];
-         for(var i = 0;i < buff.length;i++)
-         {
-         buffs[i] = buff[i];
-         }
-         uoLoadWrite.writeAttris("msg=" + buffs);
-         console.info("收到设备更新，但云还没连上");
-         }*/
+
     }
 });
 //云平台写属性协议接口
@@ -435,16 +388,12 @@ iotDevice.on("write",function(_writeZgbAttributeQueue,_writeModbusAttributeQueue
 //云平台请求扫描设备
 iotDevice.on(common.iotCmdId_t().IOT_SCAN_DEVICE_EVENT,function(data)
 {
-
     zgbManager.zgbNwkmgrReq(zgbManagerCmdId_t.ZGB_SCAN_DEVICE_COMMOND,data);
-
 });
 //云平台请求删除设备
 iotDevice.on(common.iotCmdId_t().IOT_DELETE_DEVICE_EVENT,function(data)
 {
-
     zgbManager.zgbNwkmgrReq(zgbManagerCmdId_t.ZGB_DELETE_DEVICE_COMMOND,data);
-
 });
 
 //请求跟新网关程序
@@ -452,37 +401,15 @@ iotDevice.on(common.iotCmdId_t().IOT_REQ_UPDATA_GATEWAY_EVENT,function(data)
 {
     if(data.reqType == 0){
         //更新
-        update();
-        //reset();
+        updateGitHub();
     }
     if(data.reqType == 1){
-        //更新
-        reset();
+        //重启线程
+        resetGatewayIndexProcess();
     }
 });
 
-
-
-
-/*function update() { 
-    
-    exec('git pull',function (error, stdout, stderr) 
-    { 
-         console.info('stdout: ' + stdout); 
-         console.info('stderr: ' + stderr); 
-         if (error !== null) 
-         { 
-            console.info('exec error: ' + error); 
-         } 
-         else 
-         { 
-             console.info('exec stdout: ' + stdout); 
-         } 
-    }); 
- }*/
-
-
-function update() {
+function updateGitHub() {
     exec('git pull',function (error, stdout, stderr) 
     {
         console.log('stdout: ' + stdout);
@@ -500,17 +427,14 @@ function update() {
             if(stdout.indexOf("Already up-to-date.") == -1)
             {
                 //console.log(stdout);
-                setTimeout(function () 
-                {
-                    reset();
-                    
-                }, 1000);
+                resetGatewayIndexProcess();
             }
         }
     });
 }
-
-function reset() {
+//重启gatewayIndex所在的线程
+function resetGatewayIndexProcess()
+{
     var child = exec('pm2 restart 0',
         function (error, stdout, stderr) {
             console.log('stdout: ' + stdout);
@@ -538,10 +462,9 @@ iotDevice.on(common.iotCmdId_t().IOT_UPLOAD_CONFIG_EVENT,function(data)
             status = iotGateway.gwStatus_t.STATUS_SUCCESS;
         }
         self.gwUpLoadConfigRsp(status,uid);
-        if(!err){
-            setTimeout(function(){
-                updateConfig();
-            },1000)
+        if(!err)
+        {
+            resetGatewayIndexProcess();
         }
     });
 });
@@ -562,6 +485,8 @@ iotDevice.on("rsp",function(cmdId,data)
 //========================================================================================================================================================
 //========================================================================================================================================================
 //========================================================================================================================================================
+/*
+var testWriteInterval = null;
 var testList = [];
 var aaaaaa = null;
 var bbbbbbb = 0;
@@ -641,4 +566,4 @@ function testList_test(data)
     }
 
     zgbManager.writeAttris(data);
-}
+}*/
