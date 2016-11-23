@@ -165,7 +165,7 @@ xmlParse.on('complete', function (data) {
         startModuleTime = setTimeout(function()
         {
             initZgbClient(configDataObj.zgbAttrisLenght);
-            startZGB_DidoUseTime();
+            //startZGB_DidoUseTime();
             if(pathConfig.get_debug() == false)
             {
                 initModbus(configDataObj.modbusAttrisLenght);
@@ -199,10 +199,10 @@ function upDateSystemTime()
             nextTime = 5000;
         }else{
             nextTime = 60000;
-            if(gatewayTimeIsUpDataed == false){
+            /*if(gatewayTimeIsUpDataed == false){
                 gatewayTimeIsUpDataed = true;
                 startZGB_DidoUseTime();
-            }
+            }*/
             //logger.writeErr("同步网络时间成功");
             //process.exit();
         }
@@ -213,14 +213,14 @@ function upDateSystemTime()
 }
 
 //启动zgb dido设备的使用时间统计
-function startZGB_DidoUseTime()
+/*function startZGB_DidoUseTime()
 {
     if(gatewayTimeIsUpDataed == false && zgbManager!= null)
     {
         //启动dido统计系统
         //zgbManager.beginDidoUse();
     }
-}
+}*/
 
 function initYunClent()
 {
