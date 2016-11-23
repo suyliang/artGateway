@@ -1,6 +1,15 @@
 
-第一次时：网关下载服务器上的程序
-git clone https://github.com/547895019/artGateway.git
+第一次时：网关下载服务器上的程序（三个）
+artGateway程序：
+git clone https://github.com/suyliang/artGateway.git
+
+zgb包：
+https://github.com/547895019/zigbee-zstack-gateway-snappy-master.git
+
+
+modbus包：
+https://github.com/547895019/libmodbus-beaglebone_cape.git
+
 
 //网关上传程序到服务器
 git add .
@@ -9,3 +18,26 @@ git push -u origin master
 
 //网关从服务器上更新程序 并合并
 git pull
+
+
+问题1：
+error: server certificate verification failed. CAfile: /etc/ssl/certs/ca-certificates.crt CRLfile: none
+
+这个报错说明证书校验有问题：
+需要修改环境变量（现在是linux系统）
+
+找到（并打开）.bashrc 文件，方法不一，可自行查找
+
+1.在系统的更目录下ls -a 查看用户目录下有哪些文件
+（比如 root@beaglebone:~# ls -a）
+会出现结果如：.  ..  .bash_history  .bashrc  .c9  .cache  .node-gyp  .npm  .pm2  .profile  .vim  .viminfo
+
+2.nano .bashrc 进入.bashrc文件
+
+在最后一行加入（目的是关掉校验）
+export GIT_SSL_NO_VERIFY=1   
+
+保存：
+按提示进行操作
+
+重新执行git clone（或push） 就可以了
