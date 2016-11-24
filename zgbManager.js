@@ -41,9 +41,9 @@ var bobv_writeList = [];
 var isScanIng = false;
 var scanTimeOut = -1;
 
-var getCheck2541IsBusyInterval = -1;
-var getCheck2541IsBusyIndTimeOut = -1;
-var getCheck2541IsBusyIndTimeOutCount = 0;
+var readNwkmgrBusyInterval = -1;//间隔20秒读取Nwkmgr的定时器
+var readNwkmgrBusyIndTimeOut = -1;//读取Nwkmgr超时2次以上后执行复位的定时器
+var readNwkmgrBusyTimeOutCount = 0;//读取Nwkmgr端口超时的次数 超过多稍次就复位
 
 var manager_self;
 
@@ -86,7 +86,6 @@ ZgbManager.prototype.writeBuff = function(buff)
 }
 
 var checkDevicesIsOffLine = -1;
-//var checkedAddress = new Array();
 ZgbManager.prototype.setReadAttrisDictionary = function(_zgbAttrisDictionary,_devicesDictionary)
 {
     this.zgbAttrisDictionary = _zgbAttrisDictionary;
@@ -119,7 +118,7 @@ ZgbManager.prototype.beginDidoUse = function()
     //-------------------------------------------------------------------------------
 }
 
-
+//检测zgb设备的状态，每 checkTimes 秒检查一次，如果每个设备的上次更新时间和当前的时间差大于checkTimes，当作超时，而判断为在线的处理在 收到该设备的报告返回的时候会做出改变
 var checkTimes = 5;
 function checkDeviceStatus()
 {
@@ -137,13 +136,10 @@ function checkDeviceStatus()
                 continue;
             };
 
-            zgbUpdateDeviceStatusObj.deviceStatus = -1;//三秒钟重置设备状态，则下次有更新，保证能发到服务器上去
-            //zgbUpdateDeviceStatusObj.tag = 1;
+            zgbUpdateDeviceStatusObj.deviceStatus = -1;//checkTimes 秒钟重置设备状态，则下次有更新，保证能发到服务器上去
 
             if (time - zgbUpdateDeviceStatusObj.upDataTime >= checkTimes * 60 * 1000)
             {
-                //zgbUpdateDeviceStatusObj.tag = 0;
-
                 var deviceStatus = Iotgateway.DeviceStatus_t.DEVICE_OFF_LINE;
                 manager_self.upDateDeviceStatus2(
                     zgbUpdateDeviceStatusObj,
@@ -295,7 +291,7 @@ ZgbManager.prototype.dealNwkmgrCallBack = function(packet)
     {
         var local_deviceInfo = nwkmgrAction.deal_local_deviceList_ind(packet);
         global.local_deviceInfo = local_deviceInfo;
-        check2541IsBusy(local_deviceInfo);
+        checkNwkmgrIsBusy(local_deviceInfo);
     }
     if(packet[1] == Nwkmgr.nwkMgrCmdId_t.NWK_ZIGBEE_SYSTEM_RESET_CNF)
     {
@@ -389,30 +385,6 @@ ZgbManager.prototype.dealZgbAction = function(driverId,deviceId,objectId,attribu
     this.writeBuff(buff);
     return buff;
 }
-
-
-//处理zgb的控制事件 比如开关 调节灯的亮度
-/*ZgbManager.prototype.dealZgbAction1 = function(zgbDevice_address,clusterid,endpointId,controlValue)
-{
-    if(this.gateway_client.getStatus() == 0){
-        return;
-    }
-
-    if(cmdobj.zbSetCmdId == Gateway.gwCmdId_t.DEV_SET_ONOFF_STATE_REQ)
-    {
-        var buff = gatewayAction.onoffControl(zgbDevice_address,clusterid,endpointId,controlValue);
-    }
-    if(cmdobj.zbSetCmdId == Gateway.gwCmdId_t.DEV_SET_COLOR_REQ)
-    {
-        var buff = gatewayAction.colorControl(zgbDevice_address,clusterid,endpointId,controlValue);
-    }
-    if(cmdobj.zbSetCmdId == Gateway.gwCmdId_t.DEV_SET_LEVEL_REQ)
-    {
-        var buff = gatewayAction.levelControl(zgbDevice_address,clusterid,endpointId,controlValue);
-    }
-    this.writeBuff(buff);
-    return buff;
-}*/
 
 //执行扫描设备的逻辑处理
 ZgbManager.prototype.scanDevicesJoin = function(gwScanDeviceReq)
@@ -514,52 +486,45 @@ ZgbManager.prototype.setbobv_writeList = function()
 }
 
 //检测是否忙碌
-function check2541IsBusy(local_deviceInfo)
+//间隔20秒检查一次：发送一次获取本地设备的开关状态（目前找不到更好的方法）
+var getOnOffStatusInterval_Time = 20000;//20秒
+//十秒为超时时间，读取本地某个设备的开关状态，10之内没返回就当作超时（如果10秒内返回了，就取消定时器，不叠加也不复位），叠加一次超时次数，超过1次就执行复位
+var getOnOffStatusTimeOut_Time = 10000;//10秒
+function checkNwkmgrIsBusy(local_deviceInfo)
 {
-    clearInterval(getCheck2541IsBusyInterval);
-    clearTimeout(getCheck2541IsBusyIndTimeOut);
+    clearInterval(readNwkmgrBusyInterval);
+    clearTimeout(readNwkmgrBusyIndTimeOut);
 
-    getCheck2541IsBusyInterval = setInterval(function()
+    readNwkmgrBusyInterval = setInterval(function()
     {
         if(manager_self.gateway_client.getStatus() == 1) {
 
             manager_self.zgbGatewayReq(zgbManagerCmdId_t.ZGB_GET_DEVICE_ONOFF_STATUS_COMMOND, local_deviceInfo);
 
-            getCheck2541IsBusyIndTimeOut = setTimeout(function () {
-                getCheck2541IsBusyIndTimeOutCount++;
+            readNwkmgrBusyIndTimeOut = setTimeout(function () {
+                readNwkmgrBusyTimeOutCount ++;
 
-                if (getCheck2541IsBusyIndTimeOutCount >= 2) {
+                if (readNwkmgrBusyTimeOutCount >= 2) {
                     //超过两次不能在2541读到数据，判定为超时
-                    getCheck2541IsBusyIndTimeOutCount = 0;
+                    readNwkmgrBusyTimeOutCount = 0;
                     //执行复位
                     var boo = manager_self.zgbNwkmgrReq(zgbManagerCmdId_t.ZGB_SYSTEM_RESET_COMMOND,0);
 
                     if (boo == true) {
-                        logger.writeErr("执行复位：" + getCheck2541IsBusyIndTimeOutCount);
+                        logger.writeErr("执行复位：" + readNwkmgrBusyTimeOutCount);
                     }
                 }
-            }, 10000)
+            }, getOnOffStatusTimeOut_Time);//十秒为超时时间，读取本地某个设备的开关状态，10之内没返回就当作超时，叠加一次超时次数，超过1次就执行复位
         }
-    },20000);
+    },getOnOffStatusInterval_Time);
 }
 
-//获取到的本地设备的开关状态，
+//能获取到读取开关状态的返回，不管是本地还是2541的，那就是和2540或者2541端口的连接还没断，所以：停止叠加readNwkmgrBusyTimeOutCount和定时器
 function checkIsLocalGetOnOffStatus(devGetOnOffStateInd)
 {
 
-    getCheck2541IsBusyIndTimeOutCount = 0;
-    clearTimeout(getCheck2541IsBusyIndTimeOut);
-    /*var address = devGetOnOffStateInd.srcAddress.ieeeAddr;
-     if(global.local_deviceInfo != null)
-     {
-         if(global.local_deviceInfo.ieeeAddress == address)
-         {
-             //读取本地检测2541端口是否busy成功
-             getCheck2541IsBusyIndTimeOutCount = 0;
-             clearTimeout(getCheck2541IsBusyIndTimeOut);
-             //return "2541IsOk";
-         }
-     }*/
+    readNwkmgrBusyTimeOutCount = 0;
+    clearTimeout(readNwkmgrBusyIndTimeOut);
 }
 
 //接收客户端发下来的写属性命令，参数为数组，储存起来，一条一条的处理
@@ -663,50 +628,8 @@ ZgbManager.prototype.getReadAttrisBuff = function()
             return;
         }
     }
-    /*var first_readIndex = -1;
-     var has_readIndex = false;
-     for(var i = 0;i < readAttrisArray.length;i++)
-     {
-         if(readAttrisArray[i].continueTimeOut < global.zgbTimeOutMax){
-             if(first_readIndex == -1){
-                first_readIndex = i;
-             }
-             if(i >= readAttrisIndex){
-                 //在下标大于当前索引的时候，还没读到三次，则可以继续读，那些已经读了三次的设定为设备出问题了,然后重置？然后下次再继续读？还是不再理会？
-                 //doSomeThingBack();
-                 //暂时先跳过当前
-                 readAttrisIndex = i;
-                 has_readIndex = true;
-                 break;
-             }
-         }else{
-            //更新设备状态
-             var deviceStatus = Iotgateway.DeviceStatus_t.DEVICE_OFF_LINE;
-             manager_self.upDateDeviceStatus(readAttrisArray[readAttrisIndex],deviceStatus);
-         }
-     }
-     //打印日记，查看设备是否还在读取（读取的超时情况）
-     canReadIndex = first_readIndex;
-     //--------------------------------------------------------------------------
-
-     if(first_readIndex == -1){
-         //没有可读的，都已经出了问题
-         //可以做一些提示给客户端
-         logger.writeDebug("zgb all attris read timeout count is max");
-         common.resetZgbReadAttris(readAttrisArray);
-         readAttrisIndex = 0;
-         canReadIndex = 0;
-         //return;
-     }
-     else
-     {
-         if(has_readIndex == false){
-            readAttrisIndex = first_readIndex;
-        }
-     }*/
     if((readAttrisArray[readAttrisIndex].continueTimeOut % global.zgbTimeOutMax) == 0 && readAttrisArray[readAttrisIndex].continueTimeOut > 0 )
     {
-
         var deviceStatus = Iotgateway.DeviceStatus_t.DEVICE_OFF_LINE;
 
         manager_self.upDateDeviceStatus(
@@ -813,33 +736,6 @@ ZgbManager.prototype.readTimeOutFun = function(boo,_key)
         this.getReadAttrisBuff();
     }
 }
-
-//对比本地缓存的状态，如果状态改变了，才响应到云上去
-//参数value 里必须带有driverId,deviceAddress,clusterId,clusterId,attris,不然在字典里找不到对应的属性
-/*ZgbManager.prototype.upDateDeviceStatus = function(driverId,deviceAddress,clusterId,attriId,endpointId,deviceStatus)
-{
-    var changeAttris = [];
-
-    var dicKey = zgbCommon.setZgbReadAttrisDictionary(driverId,deviceAddress,clusterId,attriId,endpointId);
-
-    var readAttrisObj = this.zgbAttrisDictionary[dicKey];
-
-    if(readAttrisObj){
-
-        if(readAttrisObj.deviceStatus != deviceStatus)
-        {
-            readAttrisObj.deviceStatus = deviceStatus;
-            console.info(readAttrisObj.deviceDes + "的状态发生了改变：" + deviceStatus);
-            logger.writeWarn(readAttrisObj.deviceDes + "的状态发生了改变：" + deviceStatus);
-            changeAttris.push(readAttrisObj);
-        }
-
-        if(changeAttris.length > 0)
-        {
-            this.iotDevice.IotGwUpdataDeviceStatusInd(changeAttris);
-        }
-    }
-}*/
 
 ZgbManager.prototype.upDateDeviceStatus = function(driverId,deviceAddress,clusterId,attriId,endpointId,deviceStatus)
 {
@@ -949,7 +845,7 @@ ZgbManager.prototype.sendAttrisChangeToYun = function(value)
                     }*/
                     //------------------------------------------------------------------------------------
                     if(nowtime - valueArr.upDataTime < mastSendTime){
-                        //两分钟强制更新一次
+                        //mastSendTime分钟强制更新一次
                         if( oldValue == newValue)continue;
                     }
                     //logger.writeInfo("-------" + value.alertStr);
