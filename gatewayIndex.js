@@ -433,16 +433,33 @@ function updateGitHub() {
     });
 }
 //重启gatewayIndex所在的线程
-function resetGatewayIndexProcess()
+var resetDelayTime = 0;
+function resetGatewayIndexProcess(delay)
 {
-    var child = exec('pm2 restart 0',
+    if(resetDelayTime != 0)return;
+    if(delay == null){
+        delay = 2000;
+    }
+    setTimeout(function()
+    {
+        resetDelayTime = 0;
+        var child = exec('pm2 restart 0',
+            function (error, stdout, stderr) {
+                console.log('stdout: ' + stdout);
+                console.log('stderr: ' + stderr);
+                if (error !== null) {
+                    console.log('exec error: ' + error);
+                }
+            });
+    },delay);
+    /*var child = exec('pm2 restart 0',
         function (error, stdout, stderr) {
             console.log('stdout: ' + stdout);
             console.log('stderr: ' + stderr);
             if (error !== null) {
                 console.log('exec error: ' + error);
             }
-        });
+        });*/
 }
 
 
