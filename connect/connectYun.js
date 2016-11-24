@@ -23,6 +23,7 @@ var isInitStep = 0;
 var reconnectTime = null;
 var self;
 
+var heartBeatInterval = 0;//心跳包的定时器
 
 var messageTime = 0;
 
@@ -68,8 +69,10 @@ function connectYun(_port,_host,_hbd,_iotDevice){
                     didoCacheList.shift();
                 }
             }
+
             heartBeatYun();
-            setInterval(heartBeatYun,30000); //30秒一次心跳包*/
+            clearInterval(heartBeatInterval);
+            heartBeatInterval = setInterval(heartBeatYun,30000); //30秒一次心跳包*/
         }
     });
 
@@ -166,7 +169,6 @@ function reconnect_callBack()
                     sendInitConnectInfo();
                 }
             }
-
         },10000);
     }
 
