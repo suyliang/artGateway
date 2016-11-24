@@ -421,7 +421,6 @@ function updateGitHub() {
         }
         else
         {
-             _led.led_write(2, 1);
             iotDevice.gwCheckGatewayUpdataRsp(0, true);
                 
             if(stdout.indexOf("Already up-to-date.") == -1)
