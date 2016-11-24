@@ -24,6 +24,9 @@ var reconnectTime = null;
 var self;
 
 var heartBeatInterval = 0;//心跳包的定时器
+var heartBeatDelay = 30000;//心跳包的间隔时间
+var handShakeDelay = 10000;//握手的间隔
+var connectIsCloseedTime = handShakeDelay * 4 + 5000;//云端没返回的时间，4次握手间隔时间
 
 var messageTime = 0;
 
@@ -72,7 +75,7 @@ function connectYun(_port,_host,_hbd,_iotDevice){
 
             heartBeatYun();
             clearInterval(heartBeatInterval);
-            heartBeatInterval = setInterval(heartBeatYun,30000); //30秒一次心跳包*/
+            heartBeatInterval = setInterval(heartBeatYun,heartBeatDelay); //30秒一次心跳包*/
         }
     });
 
@@ -162,14 +165,14 @@ function reconnect_callBack()
 
             var dateTime = new Date().getTime()
 
-            if( dateTime - messageTime > 56000)
+            if( dateTime - messageTime > connectIsCloseedTime)
             {
                 if(isConnected == 1)
                 {
                     sendInitConnectInfo();
                 }
             }
-        },10000);
+        },handShakeDelay);
     }
 
 
