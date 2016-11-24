@@ -3,12 +3,12 @@ npm install  pm2 -g
 
 
 用法
-//设置开机运行三步骤
-实例：pm2 start /var/lib/cloud9/artGateway/gatewayIndex.js
-//进程信息pm2 logs node-red //进入进程日记
+//设置开机运行三步骤（先进入项目目录下如：artGateway，下面的gatewayIndex.js位于artGateway目录的根目录下，下面的所以步骤都是在artGateway路径下操作）
+实例：pm2 start gatewayIndex.js
 pm2 save  //保存配置
 pm2 startup //设置开机运行
 
+//进程信息pm2 logs node-red 进入进程日记
 
 
 $ pm2 start app.js -i 4 #后台运行pm2，启动4个app.js 
