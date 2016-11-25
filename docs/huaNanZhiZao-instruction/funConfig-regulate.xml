@@ -1926,13 +1926,6 @@ deviceAddr:5149013072769127=====deviceStatus:1      00124B0007257067-->
 		</driver>
 		<driver>
 			<driverId>3</driverId>
-			<protocolName>待用-协议</protocolName>
-			<pollingTime>1000</pollingTime>
-			<devices>
-			</devices>
-		</driver>
-		<driver>
-			<driverId>4</driverId>
 			<protocolName>火灾检测-协议</protocolName>
 			<pollingTime>1000</pollingTime>
 			<devices>

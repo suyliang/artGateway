@@ -66,7 +66,6 @@ ConfigManager.prototype.getXmlUpDownData = function(iotDevice)
     var zgbAttrisDictionary = new Array();
     var modbusAttrisArray = [];
     var bacnetAttrisArray = [];
-    var carParkAttrisArray = new Array();
     var fireCheckAttrisArray = [];
 
     var zgbDevicesDictionary = new Array();
@@ -297,9 +296,7 @@ ConfigManager.prototype.getXmlUpDownData = function(iotDevice)
                             modbusAttrisArray.push(modbusParameters);
                             modbusAttrisLenght ++;
                         //}
-                    }
-
-                    else if(driverId == 2){
+                    }else if(driverId == 2){
                         var instanceType = common.parseInt(attributes[att].instanceType);
                         var instanceIndex = common.parseInt(attributes[att].instanceIndex);
                         /*if (attributes[att].attributeValue == '' || attributes[att].attributeValue == 'null')
@@ -329,32 +326,6 @@ ConfigManager.prototype.getXmlUpDownData = function(iotDevice)
                             bacnetAttrisLenght ++;
                         //}
                     }else if(driverId == 3){
-
-                        /*if (attributes[att].attributeValue == '' || attributes[att].attributeValue == 'null')
-                        {*/
-                            var carKey = zgbCommon.setCarParkAttrisKey(carPark_deviceAddress);
-                            var carParkPacket = new common.carParkAtttrisPacket();
-                            carParkPacket.driverId = driverId;
-                            carParkPacket.deviceId = deviceId;
-                            carParkPacket.deviceAddress = carPark_deviceAddress;
-                            carParkPacket.objectId = objectId;
-                            carParkPacket.attributeDataType = attributeDataType;
-                            carParkPacket.attributeType = attributeType;
-                            carParkPacket.index = carParkAttrisLenght;
-
-                            carParkPacket.objectType = objectType;
-                            carParkPacket.objectIndex = objectIndex;
-                            carParkPacket.deviceDes = device_desc;
-                            carParkPacket.deviceStatus = -1;
-
-                            carParkPacket.attributeValueMax = attributeValueMax;
-                            carParkPacket.attributeValueMin = attributeValueMin;
-
-                            carParkAttrisArray[carKey] = carParkPacket;
-                            carParkAttrisLenght ++;
-                        //}
-                    }
-                    else if(driverId == 4){
 
                         /*if (attributes[att].attributeValue == '' || attributes[att].attributeValue == 'null')
                         {*/
@@ -404,16 +375,12 @@ ConfigManager.prototype.getXmlUpDownData = function(iotDevice)
     configDataObj.bacnetAttrisArray = bacnetAttrisArray;
     configDataObj.bacnetAttrisLenght = bacnetAttrisLenght;
 
-    configDataObj.carParkAttrisArray = carParkAttrisArray;
-    configDataObj.carParkAttrisLenght = carParkAttrisLenght;
-
     configDataObj.fireCheckAttrisArray = fireCheckAttrisArray;
     configDataObj.fireAttrisLenght = fireAttrisLenght;
 
     configDataObj.zgbDevicesDictionary = zgbDevicesDictionary;//统计zgb有多少个设备
 
     return configDataObj;
-    //return [readAttrisArray,zgbAttrisDictionary,modbusAttrisArray,bacnetAttrisArray,carParkAttrisArray,fireCheckAttrisArray,zgbDevicesDictionary];
 }
 
 ConfigManager.prototype.getIeeeAddrByDriverId_DeviceId = function(driverId,deviceId)

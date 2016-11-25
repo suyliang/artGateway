@@ -68,7 +68,6 @@ var zgbManager;
 var modbusManager;
 var bacnetManager;
 var fireCheckManager;
-var carParkManager;
 
 var ConfigManager = require('./configManager')
 var configManager = new ConfigManager();
@@ -143,7 +142,6 @@ xmlParse.on('complete', function (data) {
             zgbAttrisDictionary = configDataObj.zgbAttrisDictionary;
             modbusAttrisArray = configDataObj.modbusAttrisArray;
             bacnetAttrisArray = configDataObj.bacnetAttrisArray;
-            //carAttrisArray = configDataObj.carParkAttrisArray;
             fireAttrisArray = configDataObj.fireCheckAttrisArray;
             zgbDevicesDictionary = configDataObj.zgbDevicesDictionary;
         }
