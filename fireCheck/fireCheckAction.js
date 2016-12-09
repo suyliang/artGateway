@@ -62,9 +62,10 @@ function fireCheckAction()
                     //2为火灾报警，发1
                     value = parseInt(dataArray[3],16);
                 }
-                if(cmdType == 4)
+                if(cmdType == 4 || cmdType == 3)
                 {
                     //如果是地磁系统的心跳包 则把状态更新到 地磁的状态中去
+                    value = parseInt(dataArray[3]);
                     cmdType = 3
                 }
                 if(address != "0")
