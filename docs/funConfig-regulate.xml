@@ -314,7 +314,7 @@ deviceAddr:5149013072769127=====deviceStatus:1      00124B0007257067-->
 						</object>
 						<object>
 							<objectId>7</objectId>
-							<objectDes>DO3</objectDes>
+							<objectDes>DO1</objectDes>
 							<objectType>5</objectType>
 							<objectIndex>2</objectIndex>
 							<endpointId>15</endpointId>
@@ -346,7 +346,7 @@ deviceAddr:5149013072769127=====deviceStatus:1      00124B0007257067-->
 						</object>
 						<object>
 							<objectId>9</objectId>
-							<objectDes>DO1</objectDes>
+							<objectDes>DO3</objectDes>
 							<objectType>5</objectType>
 							<objectIndex>2</objectIndex>
 							<endpointId>17</endpointId>
